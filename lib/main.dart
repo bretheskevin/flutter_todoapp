@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:global_state/gs.dart';
+import 'models/todo.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,8 +26,8 @@ class MyHomePage extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(left: 100, bottom: 24),
+            width: MediaQuery.of(context).size.width * 0.8,
+            padding: const EdgeInsets.only(bottom: 24),
             margin: const EdgeInsets.only(top: 50),
             child: const Text(
               "TODO",
@@ -41,16 +41,21 @@ class MyHomePage extends StatelessWidget {
             ),
           ),
           Container(
-            width: MediaQuery.of(context).size.width * 0.8,
+            margin: EdgeInsets.only(
+              left: MediaQuery.of(context).size.width * 0.1,
+              right: MediaQuery.of(context).size.width * 0.1),
             height: 80,
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
               color: Color.fromARGB(255, 36, 39, 61),
             ),
-            child: TaskEntry(),
+            child: const TaskEntry(),
           ),
           const SizedBox(width: 1, height: 30,), //margin
-          Tasks(),
+          // const Tasks(),
+          const Expanded(
+            child: Tasks(),
+          ),
           const SizedBox(width: 1, height: 30,), //margin
         ],
       ),
@@ -71,36 +76,26 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class Todo {
-  var id;
-  var content;
+class TaskEntry extends StatefulWidget {
+  const TaskEntry({Key? key}) : super(key: key);
 
-  Todo(this.id, this.content);
+  @override
+  _TaskEntryState createState() => _TaskEntryState();
 }
 
-class TaskEntry extends GSWidget {
-  @override
-  initGSMap() {
-    gsmap[#id] = 0;
-    List<Todo> todos = [];
-    gsmap[#todos] = todos;
-    gsmap[#count] = 0;
-  }
+class _TaskEntryState extends State<TaskEntry> {
+
+  int id = 0;
+  List<Todo> todos = [];
 
   void _addTodo(content) {
-    gsmap[#todos].add(Todo(gsmap[#id], content));
-    gsmap[#id]++;
-    gsmap[#count]++;
+    todos.add(Todo(id, content));
+    id++;
   }
 
 
   @override
   Widget build(BuildContext context) {
-    final cards = [];
-    for (int i = 0; i < gsmap[#todos].length; i++) {
-      cards.add("a");
-    }
-
     return Row(
       children: [
         GestureDetector(
@@ -117,10 +112,10 @@ class TaskEntry extends GSWidget {
         ),
         Container(
           margin: const EdgeInsets.only(left: 20),
-          child: const SizedBox(
+          child: SizedBox(
             height: 30,
-            width: 300,
-            child: Material(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: const Material(
               color: Color.fromARGB(255, 36, 39, 61),
               child: Center(
                 child: TextField(
@@ -144,86 +139,98 @@ class TaskEntry extends GSWidget {
 }
 
 
-class Tasks extends GSWidget {
+class Tasks extends StatefulWidget {
+  const Tasks({Key? key}) : super(key: key);
+
+  @override
+  _TasksState createState() => _TasksState();
+}
+
+
+class _TasksState extends State<Tasks> {
   void _taskDone(task) {
     // do thing
   }
 
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> tasks = [];
-
-    BorderRadius _generateBorderRadius(int index, int lastIndex) {
-      if (index == 0) {
-        return const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10));
-      }
-      if (index == lastIndex) {
-        return const BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10));
-      }
-
-      return const BorderRadius.all(Radius.circular(0));
+  BorderRadius _generateBorderRadius(int index, int lastIndex) {
+    if (index == 0) {
+      return const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10));
+    }
+    if (index == lastIndex - 1) {
+      return const BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10));
     }
 
-    for (int i = 0; i < 6; i++) {
-      tasks.add(
-          Container(
-            margin: i == 0 ? const EdgeInsets.only(top: 20) : const EdgeInsets.only(top: 0),
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: 80,
-            decoration: BoxDecoration(
-              borderRadius: _generateBorderRadius(i, 5),
-              color: const Color.fromARGB(255, 36, 39, 61),
-            ),
-            child: Row(
-              children: [
-                GestureDetector(
-                  child: Container(
-                    height: 30,
-                    width: 30,
-                    margin: const EdgeInsets.only(left: 30),
-                    decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(width: 2, color: Colors.white30)),
-                  ),
-                  onTap: () => _taskDone("Hello World! $i"),
+    return const BorderRadius.all(Radius.circular(0));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Todo> tasks = [
+      Todo(0, "loremrzerjkzerjkzerjizeofnzefnzenfzefzefezfzef"),
+      Todo(1, "b"),
+      Todo(2, "c"),
+      Todo(3, "d"),
+      Todo(4, "e"),
+      Todo(5, "f")
+    ];
+
+
+    return ListView.builder(
+      itemCount: tasks.length,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: index == 0 ? EdgeInsets.only(top: 20,
+              left: MediaQuery.of(context).size.width * 0.1,
+              right: MediaQuery.of(context).size.width * 0.1)
+              :
+          EdgeInsets.only(top: 0,
+              left: MediaQuery.of(context).size.width * 0.1,
+              right: MediaQuery.of(context).size.width * 0.1),
+          height: 80,
+          decoration: BoxDecoration(
+            borderRadius: _generateBorderRadius(index, tasks.length),
+            color: const Color.fromARGB(255, 36, 39, 61),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  margin: const EdgeInsets.only(left: 30),
+                  decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(width: 2, color: Colors.white30)),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(left: 20),
-                  child: const SizedBox(
-                    width: 300,
-                    child: Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
-                          "Hello World",
-                          style: TextStyle(
-                            color: Colors.white,
-                            decoration: TextDecoration.none,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w100,
-                          ),
+                onTap: () => _taskDone("Hello World!"),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        "${tasks[index].content}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          decoration: TextDecoration.none,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w100,
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-          )
-      );
-    }
-
-    print("salut");
-    print(GSList);
-
-
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Column(
-          children: tasks,
-        ),
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
+
+
   }
 }
