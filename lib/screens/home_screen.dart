@@ -85,6 +85,16 @@ class _TaskEntryState extends State<TaskEntry> {
     super.dispose();
   }
 
+  void updateText() {
+    context.read<TodoProvider>().addTodo(myController.text);
+    myController.text = "";
+
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -101,13 +111,7 @@ class _TaskEntryState extends State<TaskEntry> {
                 border: Border.all(width: 2, color: Colors.white30)),
           ),
           onTap: () {
-            context.read<TodoProvider>().addTodo(myController.text);
-            myController.text = "";
-
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
+            updateText();
           },
         ),
         Container(
@@ -129,6 +133,9 @@ class _TaskEntryState extends State<TaskEntry> {
                     fillColor: Color.fromARGB(255, 36, 39, 61),
                     filled: true,
                   ),
+                  onSubmitted: (text) {
+                    updateText();
+                  },
                 ),
               ),
             ),
@@ -198,7 +205,6 @@ class Tasks extends StatelessWidget {
               ),
               Container(
                 width: MediaQuery.of(context).size.width > 400 ? MediaQuery.of(context).size.width * 0.6 : MediaQuery.of(context).size.width * 0.4,
-                color: Colors.green,
                 margin: const EdgeInsets.only(left: 20),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
