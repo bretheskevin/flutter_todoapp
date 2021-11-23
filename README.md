@@ -1,4 +1,4 @@
-# todo_app
+# Todo App
 
 ## About The Project
 
