@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/todo.dart';
 import "package:provider/provider.dart";
 import "package:todo_app/providers/todo_provider.dart";
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -68,11 +69,25 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class TaskEntry extends StatelessWidget {
+class TaskEntry extends StatefulWidget {
   const TaskEntry({Key? key}) : super(key: key);
 
   @override
+  _TaskEntryState createState() => _TaskEntryState();
+}
+
+class _TaskEntryState extends State<TaskEntry> {
+  final myController = TextEditingController();
+
+  @override
+  void dispose() {
+    myController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     return Row(
       children: [
         GestureDetector(
@@ -86,25 +101,27 @@ class TaskEntry extends StatelessWidget {
                 border: Border.all(width: 2, color: Colors.white30)),
           ),
           onTap: () {
-            context.read<TodoProvider>().addTodo("Hello World!");
+            context.read<TodoProvider>().addTodo(myController.text);
+            myController.text = "";
 
             FocusScopeNode currentFocus = FocusScope.of(context);
             if (!currentFocus.hasPrimaryFocus) {
               currentFocus.unfocus();
             }
-            },
+          },
         ),
         Container(
           margin: const EdgeInsets.only(left: 20),
           child: SizedBox(
             height: 30,
             width: MediaQuery.of(context).size.width * 0.5,
-            child: const Material(
-              color: Color.fromARGB(255, 36, 39, 61),
+            child: Material(
+              color: const Color.fromARGB(255, 36, 39, 61),
               child: Center(
                 child: TextField(
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration.collapsed(
+                  controller: myController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration.collapsed(
                     hintText: "Create a new todo...",
                     hintStyle: TextStyle(
                       color: Colors.white38,
@@ -122,14 +139,18 @@ class TaskEntry extends StatelessWidget {
   }
 }
 
+
 class Tasks extends StatelessWidget {
   const Tasks({Key? key}) : super(key: key);
 
-  void _taskDone(String content) {
-
-  }
+  void _taskDone(String content) {}
 
   BorderRadius _generateBorderRadius(int index, int lastIndex) {
+
+    if (index == lastIndex - 1 && index == 0) {
+      return const BorderRadius.all(Radius.circular(10));
+    }
+
     if (index == 0) {
       return const BorderRadius.only(
           topLeft: Radius.circular(10), topRight: Radius.circular(10));
@@ -176,6 +197,8 @@ class Tasks extends StatelessWidget {
                     border: Border.all(width: 2, color: Colors.white30)),
               ),
               Container(
+                width: MediaQuery.of(context).size.width > 400 ? MediaQuery.of(context).size.width * 0.6 : MediaQuery.of(context).size.width * 0.4,
+                color: Colors.green,
                 margin: const EdgeInsets.only(left: 20),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
@@ -195,16 +218,13 @@ class Tasks extends StatelessWidget {
                   ),
                 ),
               ),
-              GestureDetector(
-                child: Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(100),
-                      border: Border.all(width: 2, color: Colors.white30)),
+              Container(
+                alignment: Alignment.centerRight,
+                margin: const EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  child: SvgPicture.asset("assets/icon-cross.svg", semanticsLabel: "Delete todo"),
+                  onTap: () => context.read<TodoProvider>().removeTodo(tasks[index].id),
                 ),
-                onTap: () => _taskDone("Hello World!"),
               ),
             ],
           ),

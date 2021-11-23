@@ -14,8 +14,15 @@ class TodoProvider with ChangeNotifier {
   }
 
   void addTodo(String content) {
-    _todos.add(Todo(_count, content));
-    _incrementCount();
+    if (content.isNotEmpty) {
+      _todos.add(Todo(_count, content));
+      _incrementCount();
+      notifyListeners();
+    }
+  }
+
+  void removeTodo(int id) {
+    _todos.removeWhere((item) => item.id == id);
     notifyListeners();
   }
 }
