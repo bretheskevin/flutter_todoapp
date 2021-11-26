@@ -1,8 +1,10 @@
 import "package:flutter/material.dart";
 import "package:todo_app/models/todo.dart";
-
+import 'package:shared_preferences/shared_preferences.dart';
+import "dart:convert";
 
 class TodoProvider with ChangeNotifier {
+
   int _count = 0;
   List<Todo> _todos = [];
 
@@ -17,12 +19,27 @@ class TodoProvider with ChangeNotifier {
     if (content.isNotEmpty) {
       _todos.add(Todo(_count, content));
       _incrementCount();
+      setLocalData();
       notifyListeners();
     }
   }
 
-  void removeTodo(int id) {
+  Future<void> removeTodo(int id) async {
     _todos.removeWhere((item) => item.id == id);
+    setLocalData();
     notifyListeners();
+  }
+
+
+  void initTodo(List<dynamic> localList) {
+    for (int i = 0; i < localList.length; i++) {
+      addTodo(localList[i]["content"]);
+    }
+    notifyListeners();
+  }
+
+  setLocalData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("todos", jsonEncode(_todos));
   }
 }
