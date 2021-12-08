@@ -6,7 +6,7 @@ import "dart:convert";
 class TodoProvider with ChangeNotifier {
 
   int _count = 0;
-  List<Todo> _todos = [];
+  final List<Todo> _todos = [];
 
   int get count => _count;
   List<Todo> get todos => _todos;
